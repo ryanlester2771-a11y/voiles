@@ -1,0 +1,471 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		001000001 /* VoilesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001000002; };
+		001000003 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001000004; };
+		001000005 /* WallStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001000006; };
+		001000007 /* DetectedWall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001000008; };
+		001000009 /* ARSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001000010; };
+		001000011 /* WallDetectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001000012; };
+		001000013 /* OcclusionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001000014; };
+		001000015 /* MaterialManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001000016; };
+		001000017 /* LightingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001000018; };
+		001000019 /* AssetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001000020; };
+		001000021 /* CaptureManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001000022; };
+		001000023 /* MainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001000024; };
+		001000025 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001000026; };
+		001000027 /* ARViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001000028; };
+		001000029 /* CoachingOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001000030; };
+		001000031 /* StyleSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001000032; };
+		001000033 /* CapturePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001000034; };
+		001000035 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001000036; };
+		001000037 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 001000038; };
+		001000039 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 001000040; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		001000002 /* VoilesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoilesApp.swift; sourceTree = "<group>"; };
+		001000004 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		001000006 /* WallStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WallStyle.swift; sourceTree = "<group>"; };
+		001000008 /* DetectedWall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectedWall.swift; sourceTree = "<group>"; };
+		001000010 /* ARSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARSessionManager.swift; sourceTree = "<group>"; };
+		001000012 /* WallDetectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WallDetectionManager.swift; sourceTree = "<group>"; };
+		001000014 /* OcclusionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OcclusionManager.swift; sourceTree = "<group>"; };
+		001000016 /* MaterialManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaterialManager.swift; sourceTree = "<group>"; };
+		001000018 /* LightingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightingManager.swift; sourceTree = "<group>"; };
+		001000020 /* AssetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetManager.swift; sourceTree = "<group>"; };
+		001000022 /* CaptureManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureManager.swift; sourceTree = "<group>"; };
+		001000024 /* MainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewModel.swift; sourceTree = "<group>"; };
+		001000026 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		001000028 /* ARViewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARViewContainer.swift; sourceTree = "<group>"; };
+		001000030 /* CoachingOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachingOverlayView.swift; sourceTree = "<group>"; };
+		001000032 /* StyleSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleSelectorView.swift; sourceTree = "<group>"; };
+		001000034 /* CapturePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturePreviewView.swift; sourceTree = "<group>"; };
+		001000036 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		001000038 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		001000040 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		001000041 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		001000050 /* Voiles.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Voiles.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		00100004D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		001000042 = {
+			isa = PBXGroup;
+			children = (
+				001000043 /* Sources */,
+				001000044 /* Resources */,
+				001000051 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		001000043 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				001000045 /* App */,
+				001000046 /* Models */,
+				001000047 /* Managers */,
+				001000048 /* ViewModels */,
+				001000049 /* Views */,
+				00100004A /* Extensions */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		001000044 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				001000040 /* Assets.xcassets */,
+				001000041 /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		001000045 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				001000002 /* VoilesApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		001000046 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				001000004 /* AppState.swift */,
+				001000006 /* WallStyle.swift */,
+				001000008 /* DetectedWall.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		001000047 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				001000010 /* ARSessionManager.swift */,
+				001000012 /* WallDetectionManager.swift */,
+				001000014 /* OcclusionManager.swift */,
+				001000016 /* MaterialManager.swift */,
+				001000018 /* LightingManager.swift */,
+				001000020 /* AssetManager.swift */,
+				001000022 /* CaptureManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		001000048 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				001000024 /* MainViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		001000049 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				001000026 /* MainView.swift */,
+				001000028 /* ARViewContainer.swift */,
+				001000030 /* CoachingOverlayView.swift */,
+				001000032 /* StyleSelectorView.swift */,
+				001000034 /* CapturePreviewView.swift */,
+				001000036 /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		00100004A /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				001000038 /* Extensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		001000051 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				001000050 /* Voiles.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		00100004F /* Voiles */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 001000054 /* Build configuration list for PBXNativeTarget "Voiles" */;
+			buildPhases = (
+				00100004C /* Sources */,
+				00100004D /* Frameworks */,
+				00100004E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Voiles;
+			productName = Voiles;
+			productReference = 001000050 /* Voiles.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		001000052 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					00100004F = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = 001000053 /* Build configuration list for PBXProject "Voiles" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 001000042;
+			productRefGroup = 001000051 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				00100004F /* Voiles */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		00100004E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				001000039 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		00100004C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				001000001 /* VoilesApp.swift in Sources */,
+				001000003 /* AppState.swift in Sources */,
+				001000005 /* WallStyle.swift in Sources */,
+				001000007 /* DetectedWall.swift in Sources */,
+				001000009 /* ARSessionManager.swift in Sources */,
+				001000011 /* WallDetectionManager.swift in Sources */,
+				001000013 /* OcclusionManager.swift in Sources */,
+				001000015 /* MaterialManager.swift in Sources */,
+				001000017 /* LightingManager.swift in Sources */,
+				001000019 /* AssetManager.swift in Sources */,
+				001000021 /* CaptureManager.swift in Sources */,
+				001000023 /* MainViewModel.swift in Sources */,
+				001000025 /* MainView.swift in Sources */,
+				001000027 /* ARViewContainer.swift in Sources */,
+				001000029 /* CoachingOverlayView.swift in Sources */,
+				001000031 /* StyleSelectorView.swift in Sources */,
+				001000033 /* CapturePreviewView.swift in Sources */,
+				001000035 /* SettingsView.swift in Sources */,
+				001000037 /* Extensions.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		001000055 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		001000056 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		001000057 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Voiles;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Voiles needs camera access to detect walls and display decorative styles in augmented reality.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "arkit arm64";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.voiles.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Debug;
+		};
+		001000058 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Voiles;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Voiles needs camera access to detect walls and display decorative styles in augmented reality.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "arkit arm64";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.voiles.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		001000053 /* Build configuration list for PBXProject "Voiles" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				001000055 /* Debug */,
+				001000056 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		001000054 /* Build configuration list for PBXNativeTarget "Voiles" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				001000057 /* Debug */,
+				001000058 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 001000052 /* Project object */;
+}
