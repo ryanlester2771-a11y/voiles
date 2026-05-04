@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- GreenLight build: 2026-05-04T03 — cache-bust: location confirmed Galena, IL (zip 61036) -->
 <html lang="en">
 <head>
 <meta charset="utf-8" />
@@ -1309,7 +1310,7 @@ document.querySelectorAll("[data-set-theme]").forEach(b => b.addEventListener("c
    ===================================================================== */
 const WX_KEY = "e968af9ab90e454481e170534260405";
 const WX_LOCATION = "Galena, IL";
-const WX_URL = `https://api.weatherapi.com/v1/forecast.json?key=${WX_KEY}&q=${encodeURIComponent(WX_LOCATION)}&days=7&aqi=no&alerts=no`;
+const WX_URL = `https://api.weatherapi.com/v1/forecast.json?key=${WX_KEY}&q=${encodeURIComponent(WX_LOCATION)}&days=7&aqi=no&alerts=no&_=${Date.now()}`;
 const DAY_LABELS = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
 
 function ratingForDay(rain, wind, temp) {
