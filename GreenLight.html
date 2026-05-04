@@ -663,6 +663,12 @@
     .gl-panel:not([data-layout]) .gl-fday + .gl-fday::before { display: none; }
   }
 
+  /* ---------- Loading state (live-weather fetch in flight) ---------- */
+  .gl-conditions,
+  .gl-forecast__row { transition: opacity 220ms ease; }
+  .gl-panel.gl-loading .gl-conditions,
+  .gl-panel.gl-loading .gl-forecast__row { opacity: 0.55; }
+
   /* ---------- SCENE per-state visibility ---------- */
   .gl-scene-state { display: none; }
   .gl-panel[data-state="go"]    .gl-scene-state--go    { display: block; }
@@ -700,7 +706,7 @@
   <div class="breakpoint-label">Desktop</div>
   <div class="preview-frame">
     <!-- ============== GREENLIGHT WIDGET ============== -->
-    <div class="gl-panel" id="gl-desktop" data-state="go" data-theme="dark">
+    <div class="gl-panel gl-loading" id="gl-desktop" data-state="go" data-theme="dark">
       <div class="gl-glow" aria-hidden="true"></div>
       <svg class="gl-topo" preserveAspectRatio="none" viewBox="0 0 1280 460" aria-hidden="true">
         <path d="M0 80 Q320 50 640 80 T1280 80" />
@@ -727,7 +733,7 @@
         <div class="gl-top__right">
           <span class="gl-updated">
             <span class="gl-dot gl-dot--sm" aria-hidden="true"></span>
-            <span>Updated 7:02 AM · </span>
+            <span data-gl-field="updated">Updated 7:02 AM</span><span> · </span>
             <span class="gl-only-go">Live · All systems normal</span>
             <span class="gl-only-wait">Live · Restricted conditions</span>
             <span class="gl-only-no-go">Live · Course closure in effect</span>
@@ -759,50 +765,36 @@
 
           <div class="gl-conditions-wrap">
             <div class="gl-conditions" role="group" aria-label="Current conditions">
-              <!-- Stat 1 — TEMP -->
+              <!-- Stat 1 — TEMP (live: current.temp_f) -->
               <div class="gl-stat">
                 <div class="gl-stat__label">TEMP</div>
                 <div>
-                  <span class="gl-stat__value gl-only-go">72°</span>
-                  <span class="gl-stat__value gl-only-wait">64°</span>
-                  <span class="gl-stat__value gl-only-no-go">41°</span>
+                  <span class="gl-stat__value" data-gl-field="temp">—</span>
                   <span class="gl-stat__sub">F</span>
                 </div>
               </div>
-              <!-- Stat 2 — WIND -->
+              <!-- Stat 2 — WIND (live: current.wind_mph + wind_dir) -->
               <div class="gl-stat">
                 <div class="gl-stat__label">WIND</div>
                 <div>
-                  <span class="gl-stat__value gl-only-go">6</span>
-                  <span class="gl-stat__value gl-only-wait">12</span>
-                  <span class="gl-stat__value gl-only-no-go">28</span>
-                  <span class="gl-stat__sub gl-only-go">MPH SW</span>
-                  <span class="gl-stat__sub gl-only-wait">MPH NW</span>
-                  <span class="gl-stat__sub gl-only-no-go">MPH N</span>
+                  <span class="gl-stat__value" data-gl-field="wind">—</span>
+                  <span class="gl-stat__sub" data-gl-field="wind-sub">MPH</span>
                 </div>
               </div>
-              <!-- Stat 3 — RAIN -->
+              <!-- Stat 3 — RAIN (live: current hour's chance_of_rain) -->
               <div class="gl-stat">
                 <div class="gl-stat__label">RAIN</div>
                 <div>
-                  <span class="gl-stat__value gl-only-go">0%</span>
-                  <span class="gl-stat__value gl-only-wait">20%</span>
-                  <span class="gl-stat__value gl-only-no-go">90%</span>
-                  <span class="gl-stat__sub gl-only-go">next 4h</span>
-                  <span class="gl-stat__sub gl-only-wait">easing</span>
-                  <span class="gl-stat__sub gl-only-no-go">all day</span>
+                  <span class="gl-stat__value" data-gl-field="rain">—</span>
+                  <span class="gl-stat__sub" data-gl-field="rain-sub">this hour</span>
                 </div>
               </div>
-              <!-- Stat 4 — SKY -->
+              <!-- Stat 4 — SKY (live: current.condition.text) -->
               <div class="gl-stat">
                 <div class="gl-stat__label">SKY</div>
                 <div>
-                  <span class="gl-stat__value gl-only-go">Clear</span>
-                  <span class="gl-stat__value gl-only-wait">Damp</span>
-                  <span class="gl-stat__value gl-only-no-go">Storm</span>
-                  <span class="gl-stat__sub gl-only-go">Sunny</span>
-                  <span class="gl-stat__sub gl-only-wait">Overcast</span>
-                  <span class="gl-stat__sub gl-only-no-go">Heavy rain</span>
+                  <span class="gl-stat__value" data-gl-field="sky">—</span>
+                  <span class="gl-stat__sub" data-gl-field="sky-sub"></span>
                 </div>
               </div>
             </div>
@@ -852,7 +844,7 @@
           <div class="gl-updated-mobile">
             <span class="gl-updated">
               <span class="gl-dot gl-dot--sm" aria-hidden="true"></span>
-              <span>Updated 7:02 AM · </span>
+              <span data-gl-field="updated">Updated 7:02 AM</span><span> · </span>
               <span class="gl-only-go">Live · All systems normal</span>
               <span class="gl-only-wait">Live · Restricted conditions</span>
               <span class="gl-only-no-go">Live · Course closure in effect</span>
@@ -946,7 +938,7 @@
 
   <div class="breakpoint-label">Mobile (390px)</div>
   <div class="preview-frame preview-frame--mobile">
-    <div class="gl-panel" id="gl-mobile" data-state="go" data-theme="dark" data-layout="mobile">
+    <div class="gl-panel gl-loading" id="gl-mobile" data-state="go" data-theme="dark" data-layout="mobile">
       <div class="gl-glow" aria-hidden="true"></div>
 
       <header class="gl-top">
@@ -997,43 +989,29 @@
               <div class="gl-stat">
                 <div class="gl-stat__label">TEMP</div>
                 <div>
-                  <span class="gl-stat__value gl-only-go">72°</span>
-                  <span class="gl-stat__value gl-only-wait">64°</span>
-                  <span class="gl-stat__value gl-only-no-go">41°</span>
+                  <span class="gl-stat__value" data-gl-field="temp">—</span>
                   <span class="gl-stat__sub">F</span>
                 </div>
               </div>
               <div class="gl-stat">
                 <div class="gl-stat__label">WIND</div>
                 <div>
-                  <span class="gl-stat__value gl-only-go">6</span>
-                  <span class="gl-stat__value gl-only-wait">12</span>
-                  <span class="gl-stat__value gl-only-no-go">28</span>
-                  <span class="gl-stat__sub gl-only-go">MPH SW</span>
-                  <span class="gl-stat__sub gl-only-wait">MPH NW</span>
-                  <span class="gl-stat__sub gl-only-no-go">MPH N</span>
+                  <span class="gl-stat__value" data-gl-field="wind">—</span>
+                  <span class="gl-stat__sub" data-gl-field="wind-sub">MPH</span>
                 </div>
               </div>
               <div class="gl-stat">
                 <div class="gl-stat__label">RAIN</div>
                 <div>
-                  <span class="gl-stat__value gl-only-go">0%</span>
-                  <span class="gl-stat__value gl-only-wait">20%</span>
-                  <span class="gl-stat__value gl-only-no-go">90%</span>
-                  <span class="gl-stat__sub gl-only-go">next 4h</span>
-                  <span class="gl-stat__sub gl-only-wait">easing</span>
-                  <span class="gl-stat__sub gl-only-no-go">all day</span>
+                  <span class="gl-stat__value" data-gl-field="rain">—</span>
+                  <span class="gl-stat__sub" data-gl-field="rain-sub">this hour</span>
                 </div>
               </div>
               <div class="gl-stat">
                 <div class="gl-stat__label">SKY</div>
                 <div>
-                  <span class="gl-stat__value gl-only-go">Clear</span>
-                  <span class="gl-stat__value gl-only-wait">Damp</span>
-                  <span class="gl-stat__value gl-only-no-go">Storm</span>
-                  <span class="gl-stat__sub gl-only-go">Sunny</span>
-                  <span class="gl-stat__sub gl-only-wait">Overcast</span>
-                  <span class="gl-stat__sub gl-only-no-go">Heavy rain</span>
+                  <span class="gl-stat__value" data-gl-field="sky">—</span>
+                  <span class="gl-stat__sub" data-gl-field="sky-sub"></span>
                 </div>
               </div>
             </div>
@@ -1070,7 +1048,7 @@
           <div class="gl-updated-mobile">
             <span class="gl-updated">
               <span class="gl-dot gl-dot--sm" aria-hidden="true"></span>
-              <span>Updated 7:02 AM</span>
+              <span data-gl-field="updated">Updated 7:02 AM</span>
             </span>
           </div>
         </div>
@@ -1321,6 +1299,117 @@ function applyTheme(t) {
 }
 document.querySelectorAll("[data-set-state]").forEach(b => b.addEventListener("click", () => applyState(b.dataset.setState)));
 document.querySelectorAll("[data-set-theme]").forEach(b => b.addEventListener("click", () => applyTheme(b.dataset.setTheme)));
+
+/* =====================================================================
+   GreenLight — live weather (WeatherAPI.com)
+   Fetches current conditions + 7-day forecast on page load and applies
+   them to all .gl-panel instances. The automated GO/WAIT/NO-GO is the
+   weather signal only — the operator's manual Course Status will
+   override this in a later layer.
+   ===================================================================== */
+const WX_KEY = "e968af9ab90e454481e170534260405";
+const WX_LOCATION = "Galena, IL";
+const WX_URL = `https://api.weatherapi.com/v1/forecast.json?key=${WX_KEY}&q=${encodeURIComponent(WX_LOCATION)}&days=7&aqi=no&alerts=no`;
+const DAY_LABELS = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+
+function ratingForDay(rain, wind, temp) {
+  if (rain < 30 && wind < 15 && temp > 45) return { key: "great", label: "GREAT" };
+  if (rain > 60 || wind > 25 || temp < 35)  return { key: "poor",  label: "POOR" };
+  return { key: "ok", label: "OK" };
+}
+function weatherSignal(rain, wind, temp) {
+  if (rain < 30 && wind < 30 && temp > 32) return "go";
+  if (rain > 75 || wind > 45 || temp < 32) return "no-go";
+  return "wait";
+}
+function setField(name, value) {
+  document.querySelectorAll(`[data-gl-field="${name}"]`).forEach(el => el.textContent = value);
+}
+function setLoading(on) {
+  panels.forEach(p => p.classList.toggle("gl-loading", on));
+}
+function formatLocalTime(localStr) {
+  // WeatherAPI last_updated: "YYYY-MM-DD HH:MM" (location-local)
+  const parts = localStr.split(" ");
+  if (parts.length < 2) return localStr;
+  let [h, m] = parts[1].split(":").map(Number);
+  const am = h < 12 ? "AM" : "PM";
+  h = h % 12 || 12;
+  return `${h}:${String(m).padStart(2, "0")} ${am}`;
+}
+function dayLabelFromDate(dateStr) {
+  const [y, mo, d] = dateStr.split("-").map(Number);
+  return DAY_LABELS[new Date(y, mo - 1, d).getDay()];
+}
+function findCurrentHourRain(day0) {
+  const now = new Date();
+  const target = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:00`;
+  const match = day0.hour && day0.hour.find(h => h.time === target);
+  return match ? match.chance_of_rain : day0.day.daily_chance_of_rain;
+}
+function renderForecast(days) {
+  const html = days.slice(0, 7).map((d, i) => {
+    const max  = Math.round(d.day.maxtemp_f);
+    const rain = d.day.daily_chance_of_rain;
+    const wind = Math.round(d.day.maxwind_mph);
+    const r    = ratingForDay(rain, wind, max);
+    const todayCls   = i === 0 ? " gl-fday--today" : "";
+    const todayLabel = i === 0 ? `<span class="gl-fday__label-today">TODAY</span>` : "";
+    return `<div class="gl-fday${todayCls}">
+      <div class="gl-fday__label">${dayLabelFromDate(d.date)}${todayLabel}</div>
+      <span class="gl-fbadge gl-fbadge--${r.key}">${r.label}</span>
+      <div class="gl-fday__temp">${max}°</div>
+      <div class="gl-fday__meta">${rain}% 🌧</div>
+      <div class="gl-fday__meta">${wind} mph</div>
+    </div>`;
+  }).join("");
+  document.querySelectorAll(".gl-forecast__row").forEach(row => row.innerHTML = html);
+}
+function applyLiveWeather(data) {
+  const cur  = data.current;
+  const day0 = data.forecast.forecastday[0];
+  const tempF   = Math.round(cur.temp_f);
+  const windMph = Math.round(cur.wind_mph);
+  const rainPct = findCurrentHourRain(day0);
+
+  setField("temp",     `${tempF}°`);
+  setField("wind",     windMph);
+  setField("wind-sub", `MPH ${cur.wind_dir}`);
+  setField("rain",     `${rainPct}%`);
+  setField("rain-sub", "this hour");
+
+  const skyText = (cur.condition && cur.condition.text || "").trim();
+  const parts   = skyText.split(/\s+/);
+  if (parts.length > 1) {
+    setField("sky",     parts[0]);
+    setField("sky-sub", skyText);
+  } else {
+    setField("sky",     skyText || "—");
+    setField("sky-sub", "");
+  }
+
+  setField("updated", `Updated ${formatLocalTime(cur.last_updated)}`);
+
+  // Weather signal verdict — operator override comes in a later layer
+  applyState(weatherSignal(rainPct, windMph, tempF));
+
+  renderForecast(data.forecast.forecastday);
+}
+async function loadWeather() {
+  setLoading(true);
+  setField("updated", "Updating…");
+  try {
+    const res = await fetch(WX_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    applyLiveWeather(await res.json());
+  } catch (e) {
+    console.warn("GreenLight: live weather fetch failed —", e);
+    setField("updated", "Unable to update");
+  } finally {
+    setLoading(false);
+  }
+}
+loadWeather();
 </script>
 </body>
 </html>
