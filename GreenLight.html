@@ -1,0 +1,1320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>GreenLight — Course Status Widget (Standalone)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* =========================================================================
+     GreenLight — Course-status widget for golf course websites
+     Vanilla HTML/CSS/JS. Drop the .gl-panel block onto any page.
+     Toggle [data-theme="light|dark"] on the panel to switch themes.
+     Toggle [data-state="go|wait|no-go"] on the panel to switch verdict.
+     ========================================================================= */
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: #ececea;
+    color: #1a1a2e;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  /* ---------- Preview chrome (NOT part of the widget) ---------- */
+  .preview {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+  .preview h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0 0 6px;
+  }
+  .preview p {
+    margin: 0 0 24px;
+    color: #5a5a64;
+    font-size: 14px;
+  }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    padding: 14px 16px;
+    background: #fff;
+    border: 1px solid #e2e2dc;
+    border-radius: 14px;
+    margin-bottom: 24px;
+    position: sticky;
+    top: 16px;
+    z-index: 10;
+    box-shadow: 0 2px 12px -6px rgba(0,0,0,0.08);
+  }
+  .control-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .control-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #9a9aa4;
+  }
+  .control-btns {
+    display: inline-flex;
+    background: #f4f4f0;
+    border: 1px solid #e2e2dc;
+    border-radius: 10px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .control-btn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    padding: 7px 14px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: #5a5a64;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 120ms ease, color 120ms ease;
+  }
+  .control-btn:hover { color: #1a1a2e; }
+  .control-btn[aria-pressed="true"] {
+    background: #1a1a2e;
+    color: #fff;
+  }
+  .breakpoint-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #9a9aa4;
+    margin: 32px 0 12px;
+    padding-left: 4px;
+  }
+  .preview-frame {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 24px 60px -32px rgba(0,0,0,0.25);
+  }
+  .preview-frame--mobile {
+    max-width: 390px;
+    margin: 0 auto;
+  }
+
+  /* =========================================================================
+     GreenLight Widget — root tokens (per-theme)
+     ========================================================================= */
+  .gl-panel {
+    /* defaults: dark theme */
+    --gl-panel-bg: #1a1a2e;
+    --gl-ink: #ffffff;
+    --gl-ink-2: rgba(255,255,255,0.62);
+    --gl-ink-3: rgba(255,255,255,0.42);
+    --gl-ink-4: rgba(255,255,255,0.32);
+    --gl-surface: rgba(255,255,255,0.025);
+    --gl-surface-border: rgba(255,255,255,0.06);
+    --gl-divider: rgba(255,255,255,0.05);
+    --gl-col-divider: rgba(255,255,255,0.07);
+    --gl-ghost-bg: rgba(255,255,255,0.04);
+    --gl-ghost-border: rgba(255,255,255,0.18);
+    --gl-ghost-ink: #ffffff;
+    --gl-footer-bg: rgba(0,0,0,0.15);
+    --gl-primary-bg: #22c55e;
+    --gl-primary-ink: #0a1f12;
+    --gl-primary-shadow: 0 1px 0 rgba(255,255,255,0.25) inset, 0 8px 24px -8px rgba(34,197,94,0.55);
+    --gl-primary-disabled-bg: rgba(34,197,94,0.18);
+    --gl-primary-disabled-ink: rgba(255,255,255,0.55);
+    --gl-topo: rgba(255,255,255,0.04);
+    --gl-glow-opacity: 0.5;
+    --gl-fade-color: var(--gl-panel-bg);
+
+    /* Forecast rating tokens (reuse existing state palette — no new color values) */
+    --gl-rating-great:        #22c55e;
+    --gl-rating-great-soft:   rgba(34,197,94,0.08);
+    --gl-rating-great-border: rgba(34,197,94,0.22);
+    --gl-rating-ok:           #eab308;
+    --gl-rating-ok-soft:      rgba(234,179,8,0.08);
+    --gl-rating-ok-border:    rgba(234,179,8,0.25);
+    --gl-rating-poor:         #ef4444;
+    --gl-rating-poor-soft:    rgba(239,68,68,0.08);
+    --gl-rating-poor-border:  rgba(239,68,68,0.25);
+  }
+  .gl-panel[data-theme="light"] {
+    --gl-panel-bg: #efe6d4;
+    --gl-ink: #1f2410;
+    --gl-ink-2: rgba(31,36,16,0.72);
+    --gl-ink-3: rgba(31,36,16,0.52);
+    --gl-ink-4: rgba(31,36,16,0.4);
+    --gl-surface: rgba(255,255,255,0.45);
+    --gl-surface-border: rgba(31,36,16,0.10);
+    --gl-divider: rgba(31,36,16,0.10);
+    --gl-col-divider: rgba(31,36,16,0.12);
+    --gl-ghost-bg: rgba(255,255,255,0.55);
+    --gl-ghost-border: rgba(31,36,16,0.20);
+    --gl-ghost-ink: #1f2410;
+    --gl-footer-bg: rgba(0,0,0,0.04);
+    --gl-primary-bg: #16a34a;
+    --gl-primary-ink: #ffffff;
+    --gl-primary-shadow: 0 1px 0 rgba(255,255,255,0.4) inset, 0 8px 24px -10px rgba(22,163,74,0.45);
+    --gl-primary-disabled-bg: rgba(22,163,74,0.18);
+    --gl-primary-disabled-ink: rgba(31,36,16,0.45);
+    --gl-topo: rgba(31,36,16,0.06);
+    --gl-glow-opacity: 0.18;
+
+    /* Light-theme rating tokens (reuse existing light-state palette) */
+    --gl-rating-great:        #16a34a;
+    --gl-rating-great-soft:   rgba(22,163,74,0.10);
+    --gl-rating-great-border: rgba(22,163,74,0.30);
+    --gl-rating-ok:           #b45309;
+    --gl-rating-ok-soft:      rgba(180,83,9,0.10);
+    --gl-rating-ok-border:    rgba(180,83,9,0.30);
+    --gl-rating-poor:         #dc2626;
+    --gl-rating-poor-soft:    rgba(220,38,38,0.10);
+    --gl-rating-poor-border:  rgba(220,38,38,0.30);
+  }
+
+  /* Per-state accent — applied to badges, dots, glows, period accent, "next window" border */
+  .gl-panel[data-state="go"]      { --gl-accent: #22c55e; --gl-accent-soft: rgba(34,197,94,0.08); --gl-accent-border: rgba(34,197,94,0.22); --gl-accent-glow: rgba(34,197,94,0.35); }
+  .gl-panel[data-state="wait"]    { --gl-accent: #eab308; --gl-accent-soft: rgba(234,179,8,0.08); --gl-accent-border: rgba(234,179,8,0.25); --gl-accent-glow: rgba(234,179,8,0.35); }
+  .gl-panel[data-state="no-go"]   { --gl-accent: #ef4444; --gl-accent-soft: rgba(239,68,68,0.08); --gl-accent-border: rgba(239,68,68,0.25); --gl-accent-glow: rgba(239,68,68,0.35); }
+
+  .gl-panel[data-theme="light"][data-state="go"]    { --gl-accent: #16a34a; --gl-accent-soft: rgba(22,163,74,0.10); --gl-accent-border: rgba(22,163,74,0.30); }
+  .gl-panel[data-theme="light"][data-state="wait"]  { --gl-accent: #b45309; --gl-accent-soft: rgba(180,83,9,0.10); --gl-accent-border: rgba(180,83,9,0.30); }
+  .gl-panel[data-theme="light"][data-state="no-go"] { --gl-accent: #dc2626; --gl-accent-soft: rgba(220,38,38,0.10); --gl-accent-border: rgba(220,38,38,0.30); }
+
+  /* ---------- Panel structure ---------- */
+  .gl-panel {
+    position: relative;
+    width: 100%;
+    background: var(--gl-panel-bg);
+    color: var(--gl-ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow: hidden;
+  }
+  .gl-glow {
+    position: absolute;
+    left: -10%; top: -60%;
+    width: 45%; height: 260%;
+    background: radial-gradient(ellipse at center, var(--gl-accent-glow) 0%, transparent 60%);
+    opacity: var(--gl-glow-opacity);
+    pointer-events: none;
+  }
+  .gl-topo {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    opacity: 0.7;
+  }
+  .gl-topo path { stroke: var(--gl-topo); stroke-width: 0.8; fill: none; }
+
+  /* Top bar */
+  .gl-top {
+    position: relative;
+    padding: 14px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--gl-divider);
+    z-index: 2;
+  }
+  .gl-top__left { display: flex; align-items: center; gap: 14px; }
+  .gl-brand {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 500; color: var(--gl-ink);
+  }
+  .gl-brand-mark { width: 16px; height: 16px; }
+  .gl-brand-mark .ring  { stroke: var(--gl-accent); stroke-width: 1.2; fill: none; }
+  .gl-brand-mark .core  { fill: var(--gl-accent); }
+  .gl-vbar { width: 1px; height: 14px; background: var(--gl-col-divider); }
+  .gl-date {
+    font-size: 12px; color: var(--gl-ink-2); font-weight: 500;
+  }
+  .gl-updated {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11px; color: var(--gl-ink-3); font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  /* Status pulse dot */
+  .gl-dot {
+    position: relative; display: inline-block;
+    width: 8px; height: 8px;
+  }
+  .gl-dot::before, .gl-dot::after {
+    content: ""; position: absolute; inset: 0;
+    border-radius: 50%; background: var(--gl-accent);
+  }
+  .gl-dot::before { animation: gl-pulse 2s ease-out infinite; }
+  .gl-dot--sm { width: 6px; height: 6px; }
+  .gl-dot--md { width: 7px; height: 7px; }
+
+  @keyframes gl-pulse {
+    0%   { transform: scale(1);   opacity: 0.7; }
+    70%  { transform: scale(2.4); opacity: 0; }
+    100% { transform: scale(2.4); opacity: 0; }
+  }
+
+  /* Main row — desktop = 2 cols (content + scene) */
+  .gl-main {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 520px;
+    align-items: stretch;
+    min-height: 320px;
+  }
+  .gl-content {
+    padding: 32px 32px 28px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    justify-content: space-between;
+  }
+  .gl-scene-wrap {
+    position: relative;
+    overflow: hidden;
+    border-left: 1px solid var(--gl-divider);
+  }
+  .gl-scene-wrap::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(90deg, var(--gl-panel-bg) 0%, transparent 12%);
+    pointer-events: none;
+  }
+  .gl-scene { display: block; width: 100%; height: 100%; }
+
+  /* Verdict block */
+  .gl-verdict { display: flex; flex-direction: column; gap: 14px; }
+  .gl-badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 10px 18px;
+    background: var(--gl-accent-soft);
+    border: 1px solid var(--gl-accent-border);
+    border-radius: 999px;
+    color: var(--gl-accent);
+    font-size: 13px; font-weight: 600; letter-spacing: 0.18em;
+    width: max-content;
+  }
+  .gl-badge--md { padding: 8px 14px; font-size: 12px; gap: 8px; letter-spacing: 0.16em; }
+  .gl-badge__label { line-height: 1; }
+  .gl-headline {
+    font-size: 56px; line-height: 1.0; font-weight: 600;
+    letter-spacing: -0.025em; color: var(--gl-ink); margin: 0;
+  }
+  .gl-headline-period { color: var(--gl-accent); }
+  .gl-subhead {
+    font-size: 17px; color: var(--gl-ink-2); font-weight: 400;
+  }
+  .gl-subhead-muted { color: var(--gl-ink-3); }
+
+  /* Conditions strip */
+  .gl-conditions {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: var(--gl-surface);
+    border: 1px solid var(--gl-surface-border);
+    border-radius: 14px;
+    padding: 20px 24px;
+  }
+  .gl-stat {
+    display: flex; flex-direction: column; gap: 6px;
+    position: relative;
+    padding-left: 16px;
+  }
+  .gl-stat + .gl-stat::before {
+    content: ""; position: absolute;
+    left: 0; top: 50%; transform: translateY(-50%);
+    width: 1px; height: 36px; background: var(--gl-col-divider);
+  }
+  .gl-stat__label {
+    font-size: 10px; letter-spacing: 0.18em; color: var(--gl-ink-3); font-weight: 500;
+  }
+  .gl-stat__value {
+    font-size: 26px; font-weight: 600; color: var(--gl-ink); letter-spacing: -0.02em;
+  }
+  .gl-stat__sub {
+    font-size: 11px; color: var(--gl-ink-3); font-weight: 500;
+    margin-left: 6px; letter-spacing: 0.02em;
+  }
+
+  /* Action row */
+  .gl-action-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+  }
+  .gl-next {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 10px 14px 10px 12px;
+    background: var(--gl-surface);
+    border: 1px solid var(--gl-accent-border);
+    border-radius: 12px;
+  }
+  .gl-next__icon {
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--gl-accent-soft);
+  }
+  .gl-next__icon svg { stroke: var(--gl-accent); fill: none; }
+  .gl-next__text { display: flex; flex-direction: column; gap: 2px; }
+  .gl-next__label { font-size: 9.5px; color: var(--gl-ink-3); letter-spacing: 0.16em; font-weight: 500; }
+  .gl-next__value { font-size: 14px; color: var(--gl-ink); font-weight: 600; letter-spacing: -0.01em; }
+  .gl-next__note { font-size: 11px; color: var(--gl-ink-2); margin-left: 8px; }
+
+  .gl-ctas { display: flex; gap: 10px; }
+  .gl-btn {
+    appearance: none; border: none;
+    padding: 14px 22px;
+    border-radius: 12px;
+    font: inherit;
+    font-size: 15px; font-weight: 600;
+    letter-spacing: -0.005em;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 10px;
+    transition: transform 120ms ease;
+  }
+  .gl-btn:hover { transform: translateY(-1px); }
+  .gl-btn--primary {
+    background: var(--gl-primary-bg);
+    color: var(--gl-primary-ink);
+    box-shadow: var(--gl-primary-shadow);
+  }
+  .gl-btn--primary[disabled] {
+    background: var(--gl-primary-disabled-bg);
+    color: var(--gl-primary-disabled-ink);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  .gl-btn--primary[disabled]:hover { transform: none; }
+  .gl-btn--ghost {
+    background: var(--gl-ghost-bg);
+    border: 1px solid var(--gl-ghost-border);
+    color: var(--gl-ghost-ink);
+    font-weight: 500;
+    padding: 13px 20px;
+  }
+
+  /* =========================================================================
+     7-day forecast strip — sits between .gl-main and .gl-footer
+     ========================================================================= */
+  .gl-forecast {
+    position: relative;
+    z-index: 2;
+    border-top: 1px solid var(--gl-divider);
+    padding: 18px 48px 20px;
+    background: var(--gl-surface);
+  }
+  .gl-forecast__row {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0;
+  }
+  .gl-fday {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+  }
+  .gl-fday + .gl-fday::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 50%;
+    transform: translateY(-50%);
+    width: 1px; height: 56%;
+    background: var(--gl-col-divider);
+  }
+  .gl-fday--today {
+    border-color: var(--gl-accent-border);
+    background: var(--gl-accent-soft);
+  }
+  /* Suppress the divider lines that would otherwise touch the today border */
+  .gl-fday--today::before,
+  .gl-fday--today + .gl-fday::before { display: none; }
+
+  .gl-fday__label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    font-weight: 600;
+    color: var(--gl-ink-3);
+    text-transform: uppercase;
+  }
+  .gl-fday__label-today {
+    color: var(--gl-accent);
+    margin-left: 6px;
+    letter-spacing: 0.14em;
+  }
+  .gl-fbadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    border: 1px solid;
+  }
+  .gl-fbadge--great {
+    color: var(--gl-rating-great);
+    background: var(--gl-rating-great-soft);
+    border-color: var(--gl-rating-great-border);
+  }
+  .gl-fbadge--ok {
+    color: var(--gl-rating-ok);
+    background: var(--gl-rating-ok-soft);
+    border-color: var(--gl-rating-ok-border);
+  }
+  .gl-fbadge--poor {
+    color: var(--gl-rating-poor);
+    background: var(--gl-rating-poor-soft);
+    border-color: var(--gl-rating-poor-border);
+  }
+  .gl-fday__temp {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--gl-ink);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .gl-fday__meta {
+    font-size: 11px;
+    color: var(--gl-ink-2);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  /* Footer */
+  .gl-footer {
+    position: relative;
+    padding: 12px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid var(--gl-divider);
+    background: var(--gl-footer-bg);
+  }
+  .gl-footer__stats {
+    font-size: 11px; color: var(--gl-ink-3); letter-spacing: 0.04em; font-weight: 500;
+  }
+  .gl-powered {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11px; color: var(--gl-ink-4);
+    letter-spacing: 0.06em; font-weight: 500;
+  }
+  .gl-powered svg { fill: none; stroke: currentColor; }
+
+  /* ---------- Per-state copy via data attributes ---------- */
+  .gl-state-content { display: contents; }
+  .gl-panel .gl-only-go,
+  .gl-panel .gl-only-wait,
+  .gl-panel .gl-only-no-go { display: none; }
+  .gl-panel[data-state="go"]    .gl-only-go    { display: contents; }
+  .gl-panel[data-state="wait"]  .gl-only-wait  { display: contents; }
+  .gl-panel[data-state="no-go"] .gl-only-no-go { display: contents; }
+
+  /* The disabled CTA appears only when state=no-go; the active one only when not */
+  .gl-panel[data-state="no-go"] .gl-btn--primary--active { display: none; }
+  .gl-panel:not([data-state="no-go"]) .gl-btn--primary--disabled { display: none; }
+
+  /* =========================================================================
+     MOBILE LAYOUT — when .gl-panel has [data-layout="mobile"], or natively below 720px
+     ========================================================================= */
+  .gl-panel[data-layout="mobile"] .gl-main,
+  @media (max-width: 720px) { .gl-panel .gl-main {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }}
+  .gl-panel[data-layout="mobile"] .gl-main { grid-template-columns: 1fr; min-height: 0; }
+
+  .gl-panel[data-layout="mobile"] .gl-top { padding: 12px 18px; }
+  .gl-panel[data-layout="mobile"] .gl-brand { font-size: 12px; }
+  .gl-panel[data-layout="mobile"] .gl-date,
+  .gl-panel[data-layout="mobile"] .gl-updated { font-size: 10px; letter-spacing: 0.04em; }
+  .gl-panel[data-layout="mobile"] .gl-top .gl-vbar,
+  .gl-panel[data-layout="mobile"] .gl-top .gl-updated { display: none; }
+  .gl-panel[data-layout="mobile"] .gl-top__right { display: none; }
+
+  .gl-panel[data-layout="mobile"] .gl-content {
+    padding: 0;
+    gap: 0;
+  }
+  .gl-panel[data-layout="mobile"] .gl-scene-wrap {
+    order: -1;
+    height: 150px;
+    border-left: none;
+    border-bottom: 1px solid var(--gl-divider);
+  }
+  .gl-panel[data-layout="mobile"] .gl-scene-wrap::after {
+    background: linear-gradient(180deg, transparent 50%, var(--gl-panel-bg) 100%);
+  }
+  .gl-panel[data-layout="mobile"] .gl-scene-badge {
+    position: absolute; left: 20px; top: 16px; z-index: 2;
+  }
+  .gl-panel[data-layout="mobile"] .gl-verdict { padding: 20px 20px 18px; gap: 8px; }
+  .gl-panel[data-layout="mobile"] .gl-verdict .gl-badge { display: none; }
+  .gl-panel[data-layout="mobile"] .gl-headline { font-size: 36px; }
+  .gl-panel[data-layout="mobile"] .gl-subhead { font-size: 14px; }
+
+  .gl-panel[data-layout="mobile"] .gl-conditions-wrap { padding: 0 20px; }
+  .gl-panel[data-layout="mobile"] .gl-conditions {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 16px;
+    padding: 18px 20px;
+  }
+  .gl-panel[data-layout="mobile"] .gl-stat { padding-left: 0; }
+  .gl-panel[data-layout="mobile"] .gl-stat + .gl-stat::before { display: none; }
+
+  .gl-panel[data-layout="mobile"] .gl-action-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 14px 20px 12px;
+  }
+  .gl-panel[data-layout="mobile"] .gl-next { padding: 10px 12px; }
+  .gl-panel[data-layout="mobile"] .gl-ctas {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .gl-panel[data-layout="mobile"] .gl-btn { width: 100%; }
+
+  .gl-panel[data-layout="mobile"] .gl-updated-mobile {
+    padding: 0 20px 14px;
+  }
+  .gl-panel[data-layout="mobile"] .gl-updated-mobile .gl-updated { display: inline-flex; }
+  .gl-panel:not([data-layout="mobile"]) .gl-updated-mobile { display: none; }
+  .gl-panel:not([data-layout="mobile"]) .gl-scene-badge { display: none; }
+
+  .gl-panel[data-layout="mobile"] .gl-footer {
+    padding: 10px 20px;
+    justify-content: center;
+  }
+  .gl-panel[data-layout="mobile"] .gl-footer__stats { display: none; }
+
+  /* Forecast strip — mobile (explicit + responsive): horizontal scroll */
+  .gl-panel[data-layout="mobile"] .gl-forecast {
+    padding: 14px 0 16px;
+  }
+  .gl-panel[data-layout="mobile"] .gl-forecast__row {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    padding: 0 16px;
+    gap: 4px;
+  }
+  .gl-panel[data-layout="mobile"] .gl-fday {
+    flex: 0 0 116px;
+    padding: 12px 14px;
+    scroll-snap-align: start;
+  }
+  .gl-panel[data-layout="mobile"] .gl-fday + .gl-fday::before { display: none; }
+
+  /* hide top updated indicator on desktop variant of mobile */
+  /* responsive native (no [data-layout]) breakpoint behaviors */
+  @media (max-width: 720px) {
+    .gl-panel:not([data-layout]) .gl-top { padding: 12px 18px; }
+    .gl-panel:not([data-layout]) .gl-content { padding: 0; gap: 0; }
+    .gl-panel:not([data-layout]) .gl-scene-wrap { order: -1; height: 150px; border-left: none; border-bottom: 1px solid var(--gl-divider); }
+    .gl-panel:not([data-layout]) .gl-verdict { padding: 20px 20px 18px; }
+    .gl-panel:not([data-layout]) .gl-headline { font-size: 36px; }
+    .gl-panel:not([data-layout]) .gl-conditions { grid-template-columns: repeat(2, 1fr); gap: 20px 16px; }
+    .gl-panel:not([data-layout]) .gl-stat { padding-left: 0; }
+    .gl-panel:not([data-layout]) .gl-stat + .gl-stat::before { display: none; }
+    .gl-panel:not([data-layout]) .gl-action-row { flex-direction: column; align-items: stretch; padding: 14px 20px 12px; }
+    .gl-panel:not([data-layout]) .gl-ctas { flex-direction: column; }
+    .gl-panel:not([data-layout]) .gl-btn { width: 100%; }
+    .gl-panel:not([data-layout]) .gl-footer { padding: 10px 20px; justify-content: center; }
+    .gl-panel:not([data-layout]) .gl-footer__stats { display: none; }
+
+    .gl-panel:not([data-layout]) .gl-forecast { padding: 14px 0 16px; }
+    .gl-panel:not([data-layout]) .gl-forecast__row {
+      display: flex;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x proximity;
+      padding: 0 16px;
+      gap: 4px;
+    }
+    .gl-panel:not([data-layout]) .gl-fday {
+      flex: 0 0 116px;
+      padding: 12px 14px;
+      scroll-snap-align: start;
+    }
+    .gl-panel:not([data-layout]) .gl-fday + .gl-fday::before { display: none; }
+  }
+
+  /* ---------- SCENE per-state visibility ---------- */
+  .gl-scene-state { display: none; }
+  .gl-panel[data-state="go"]    .gl-scene-state--go    { display: block; }
+  .gl-panel[data-state="wait"]  .gl-scene-state--wait  { display: block; }
+  .gl-panel[data-state="no-go"] .gl-scene-state--no-go { display: block; }
+
+  .gl-panel[data-theme="dark"]  .gl-scene-theme--light { display: none; }
+  .gl-panel[data-theme="light"] .gl-scene-theme--dark  { display: none; }
+</style>
+</head>
+<body>
+
+<div class="preview">
+  <h1>GreenLight — Standalone Build</h1>
+  <p>Single self-contained HTML/CSS/JS. Toggle state and theme below; the same panel markup renders all six combinations.</p>
+
+  <div class="controls" role="toolbar" aria-label="GreenLight preview controls">
+    <div class="control-group">
+      <span class="control-label">State</span>
+      <div class="control-btns" role="group" aria-label="Course state">
+        <button class="control-btn" data-set-state="go"    aria-pressed="true">GO</button>
+        <button class="control-btn" data-set-state="wait"  aria-pressed="false">WAIT</button>
+        <button class="control-btn" data-set-state="no-go" aria-pressed="false">NO-GO</button>
+      </div>
+    </div>
+    <div class="control-group">
+      <span class="control-label">Theme</span>
+      <div class="control-btns" role="group" aria-label="Theme">
+        <button class="control-btn" data-set-theme="dark"  aria-pressed="true">Dark</button>
+        <button class="control-btn" data-set-theme="light" aria-pressed="false">Sand</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="breakpoint-label">Desktop</div>
+  <div class="preview-frame">
+    <!-- ============== GREENLIGHT WIDGET ============== -->
+    <div class="gl-panel" id="gl-desktop" data-state="go" data-theme="dark">
+      <div class="gl-glow" aria-hidden="true"></div>
+      <svg class="gl-topo" preserveAspectRatio="none" viewBox="0 0 1280 460" aria-hidden="true">
+        <path d="M0 80 Q320 50 640 80 T1280 80" />
+        <path d="M0 135 Q320 105 640 135 T1280 135" />
+        <path d="M0 190 Q320 160 640 190 T1280 190" />
+        <path d="M0 245 Q320 215 640 245 T1280 245" />
+        <path d="M0 300 Q320 270 640 300 T1280 300" />
+        <path d="M0 355 Q320 325 640 355 T1280 355" />
+        <path d="M0 410 Q320 380 640 410 T1280 410" />
+      </svg>
+
+      <header class="gl-top">
+        <div class="gl-top__left">
+          <span class="gl-brand">
+            <svg class="gl-brand-mark" viewBox="0 0 16 16" aria-hidden="true">
+              <circle class="ring" cx="8" cy="8" r="7" />
+              <circle class="core" cx="8" cy="8" r="2.6" />
+            </svg>
+            Pebble Ridge Golf Club
+          </span>
+          <span class="gl-vbar" aria-hidden="true"></span>
+          <span class="gl-date">Mon · May 4 · 7:02 AM</span>
+        </div>
+        <div class="gl-top__right">
+          <span class="gl-updated">
+            <span class="gl-dot gl-dot--sm" aria-hidden="true"></span>
+            <span>Updated 7:02 AM · </span>
+            <span class="gl-only-go">Live · All systems normal</span>
+            <span class="gl-only-wait">Live · Restricted conditions</span>
+            <span class="gl-only-no-go">Live · Course closure in effect</span>
+          </span>
+        </div>
+      </header>
+
+      <div class="gl-main">
+        <div class="gl-content">
+          <div class="gl-verdict">
+            <span class="gl-badge">
+              <span class="gl-dot" aria-hidden="true"></span>
+              <span class="gl-badge__label gl-only-go">GO</span>
+              <span class="gl-badge__label gl-only-wait">WAIT</span>
+              <span class="gl-badge__label gl-only-no-go">NO-GO</span>
+            </span>
+            <h2 class="gl-headline">
+              <span class="gl-only-go">Course is Open</span>
+              <span class="gl-only-wait">Cart Path Only</span>
+              <span class="gl-only-no-go">Closed Today</span><span class="gl-headline-period">.</span>
+            </h2>
+            <div class="gl-subhead">
+              <span class="gl-only-go">Play On</span>
+              <span class="gl-only-wait">Walking Encouraged</span>
+              <span class="gl-only-no-go">Course Unplayable</span>
+              <span class="gl-subhead-muted">· Pebble Ridge GC</span>
+            </div>
+          </div>
+
+          <div class="gl-conditions-wrap">
+            <div class="gl-conditions" role="group" aria-label="Current conditions">
+              <!-- Stat 1 — TEMP -->
+              <div class="gl-stat">
+                <div class="gl-stat__label">TEMP</div>
+                <div>
+                  <span class="gl-stat__value gl-only-go">72°</span>
+                  <span class="gl-stat__value gl-only-wait">64°</span>
+                  <span class="gl-stat__value gl-only-no-go">41°</span>
+                  <span class="gl-stat__sub">F</span>
+                </div>
+              </div>
+              <!-- Stat 2 — WIND -->
+              <div class="gl-stat">
+                <div class="gl-stat__label">WIND</div>
+                <div>
+                  <span class="gl-stat__value gl-only-go">6</span>
+                  <span class="gl-stat__value gl-only-wait">12</span>
+                  <span class="gl-stat__value gl-only-no-go">28</span>
+                  <span class="gl-stat__sub gl-only-go">MPH SW</span>
+                  <span class="gl-stat__sub gl-only-wait">MPH NW</span>
+                  <span class="gl-stat__sub gl-only-no-go">MPH N</span>
+                </div>
+              </div>
+              <!-- Stat 3 — RAIN -->
+              <div class="gl-stat">
+                <div class="gl-stat__label">RAIN</div>
+                <div>
+                  <span class="gl-stat__value gl-only-go">0%</span>
+                  <span class="gl-stat__value gl-only-wait">20%</span>
+                  <span class="gl-stat__value gl-only-no-go">90%</span>
+                  <span class="gl-stat__sub gl-only-go">next 4h</span>
+                  <span class="gl-stat__sub gl-only-wait">easing</span>
+                  <span class="gl-stat__sub gl-only-no-go">all day</span>
+                </div>
+              </div>
+              <!-- Stat 4 — SKY -->
+              <div class="gl-stat">
+                <div class="gl-stat__label">SKY</div>
+                <div>
+                  <span class="gl-stat__value gl-only-go">Clear</span>
+                  <span class="gl-stat__value gl-only-wait">Damp</span>
+                  <span class="gl-stat__value gl-only-no-go">Storm</span>
+                  <span class="gl-stat__sub gl-only-go">Sunny</span>
+                  <span class="gl-stat__sub gl-only-wait">Overcast</span>
+                  <span class="gl-stat__sub gl-only-no-go">Heavy rain</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gl-action-row">
+            <div class="gl-next">
+              <div class="gl-next__icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                  <circle cx="8" cy="8" r="6.2" stroke-width="1.2" />
+                  <path d="M8 4.5V8l2.2 1.6" stroke-width="1.2" stroke-linecap="round" />
+                </svg>
+              </div>
+              <div class="gl-next__text">
+                <div class="gl-next__label">
+                  <span class="gl-only-go">BEST WINDOW</span>
+                  <span class="gl-only-wait">CARTS RETURN</span>
+                  <span class="gl-only-no-go">NEXT PLAYABLE WINDOW</span>
+                </div>
+                <div>
+                  <span class="gl-next__value gl-only-go">Now → 6:30 PM</span>
+                  <span class="gl-next__value gl-only-wait">By 11:00 AM</span>
+                  <span class="gl-next__value gl-only-no-go">Tue · 9:30 AM</span>
+                  <span class="gl-next__note gl-only-go">Light winds, no rain expected</span>
+                  <span class="gl-next__note gl-only-wait">If turf dries as forecast</span>
+                  <span class="gl-next__note gl-only-no-go">Storm clears overnight · 78% confidence</span>
+                </div>
+              </div>
+            </div>
+            <div class="gl-ctas">
+              <button class="gl-btn gl-btn--primary gl-btn--primary--active">
+                Book a Tee Time
+                <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M3.5 8h9M8.5 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                </svg>
+              </button>
+              <button class="gl-btn gl-btn--primary gl-btn--primary--disabled" disabled>Tee Times Unavailable</button>
+              <button class="gl-btn gl-btn--ghost">
+                <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M3 3.5C3 3.22 3.22 3 3.5 3h2.07c.23 0 .43.16.49.38l.7 2.8a.5.5 0 0 1-.13.49L5.4 7.8a8 8 0 0 0 2.8 2.8l1.13-1.23a.5.5 0 0 1 .49-.13l2.8.7c.22.06.38.26.38.49v2.07c0 .28-.22.5-.5.5A9.5 9.5 0 0 1 3 3.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" fill="none" />
+                </svg>
+                Call Pro Shop
+              </button>
+            </div>
+          </div>
+
+          <div class="gl-updated-mobile">
+            <span class="gl-updated">
+              <span class="gl-dot gl-dot--sm" aria-hidden="true"></span>
+              <span>Updated 7:02 AM · </span>
+              <span class="gl-only-go">Live · All systems normal</span>
+              <span class="gl-only-wait">Live · Restricted conditions</span>
+              <span class="gl-only-no-go">Live · Course closure in effect</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="gl-scene-wrap">
+          <div class="gl-scene-badge">
+            <span class="gl-badge gl-badge--md">
+              <span class="gl-dot gl-dot--md" aria-hidden="true"></span>
+              <span class="gl-only-go">GO</span>
+              <span class="gl-only-wait">WAIT</span>
+              <span class="gl-only-no-go">NO-GO</span>
+            </span>
+          </div>
+          <!-- The 6 scene SVGs are inserted here by JS to keep markup readable -->
+          <div id="gl-scene-host" style="position:absolute; inset:0;"></div>
+        </div>
+      </div>
+
+      <!-- ============== 7-DAY GOLF FORECAST ============== -->
+      <section class="gl-forecast" aria-label="7-day golf forecast">
+        <div class="gl-forecast__row">
+          <div class="gl-fday gl-fday--today">
+            <div class="gl-fday__label">MON<span class="gl-fday__label-today">TODAY</span></div>
+            <span class="gl-fbadge gl-fbadge--great">GREAT</span>
+            <div class="gl-fday__temp">72°</div>
+            <div class="gl-fday__meta">10% 🌧</div>
+            <div class="gl-fday__meta">6 mph</div>
+          </div>
+          <div class="gl-fday">
+            <div class="gl-fday__label">TUE</div>
+            <span class="gl-fbadge gl-fbadge--ok">OK</span>
+            <div class="gl-fday__temp">68°</div>
+            <div class="gl-fday__meta">35% 🌧</div>
+            <div class="gl-fday__meta">14 mph</div>
+          </div>
+          <div class="gl-fday">
+            <div class="gl-fday__label">WED</div>
+            <span class="gl-fbadge gl-fbadge--poor">POOR</span>
+            <div class="gl-fday__temp">61°</div>
+            <div class="gl-fday__meta">80% 🌧</div>
+            <div class="gl-fday__meta">22 mph</div>
+          </div>
+          <div class="gl-fday">
+            <div class="gl-fday__label">THU</div>
+            <span class="gl-fbadge gl-fbadge--poor">POOR</span>
+            <div class="gl-fday__temp">58°</div>
+            <div class="gl-fday__meta">70% 🌧</div>
+            <div class="gl-fday__meta">18 mph</div>
+          </div>
+          <div class="gl-fday">
+            <div class="gl-fday__label">FRI</div>
+            <span class="gl-fbadge gl-fbadge--ok">OK</span>
+            <div class="gl-fday__temp">65°</div>
+            <div class="gl-fday__meta">25% 🌧</div>
+            <div class="gl-fday__meta">11 mph</div>
+          </div>
+          <div class="gl-fday">
+            <div class="gl-fday__label">SAT</div>
+            <span class="gl-fbadge gl-fbadge--great">GREAT</span>
+            <div class="gl-fday__temp">74°</div>
+            <div class="gl-fday__meta">5% 🌧</div>
+            <div class="gl-fday__meta">7 mph</div>
+          </div>
+          <div class="gl-fday">
+            <div class="gl-fday__label">SUN</div>
+            <span class="gl-fbadge gl-fbadge--great">GREAT</span>
+            <div class="gl-fday__temp">76°</div>
+            <div class="gl-fday__meta">0% 🌧</div>
+            <div class="gl-fday__meta">5 mph</div>
+          </div>
+        </div>
+      </section>
+      <!-- ============== /7-DAY GOLF FORECAST ============== -->
+
+      <footer class="gl-footer">
+        <div class="gl-footer__stats">18 HOLES · PAR 72 · 6,842 YDS · BENT GRASS GREENS</div>
+        <div class="gl-powered">
+          <svg width="11" height="11" viewBox="0 0 12 12" aria-hidden="true">
+            <circle cx="6" cy="6" r="5" stroke-width="1" />
+            <circle cx="6" cy="6" r="2" fill="currentColor" stroke="none" />
+          </svg>
+          POWERED BY GREENLIGHT
+        </div>
+      </footer>
+    </div>
+    <!-- ============== /GREENLIGHT WIDGET ============== -->
+  </div>
+
+  <div class="breakpoint-label">Mobile (390px)</div>
+  <div class="preview-frame preview-frame--mobile">
+    <div class="gl-panel" id="gl-mobile" data-state="go" data-theme="dark" data-layout="mobile">
+      <div class="gl-glow" aria-hidden="true"></div>
+
+      <header class="gl-top">
+        <div class="gl-top__left">
+          <span class="gl-brand">
+            <svg class="gl-brand-mark" viewBox="0 0 16 16" aria-hidden="true">
+              <circle class="ring" cx="8" cy="8" r="7" />
+              <circle class="core" cx="8" cy="8" r="2.6" />
+            </svg>
+            Pebble Ridge GC
+          </span>
+        </div>
+        <div class="gl-top__right">
+          <span class="gl-date">7:02 AM</span>
+        </div>
+      </header>
+
+      <div class="gl-main">
+        <div class="gl-content">
+          <div class="gl-scene-wrap">
+            <div class="gl-scene-badge">
+              <span class="gl-badge gl-badge--md">
+                <span class="gl-dot gl-dot--md" aria-hidden="true"></span>
+                <span class="gl-only-go">GO</span>
+                <span class="gl-only-wait">WAIT</span>
+                <span class="gl-only-no-go">NO-GO</span>
+              </span>
+            </div>
+            <div class="gl-scene-host-mobile" style="position:absolute; inset:0;"></div>
+          </div>
+
+          <div class="gl-verdict">
+            <h2 class="gl-headline">
+              <span class="gl-only-go">Course is Open</span>
+              <span class="gl-only-wait">Cart Path Only</span>
+              <span class="gl-only-no-go">Closed Today</span><span class="gl-headline-period">.</span>
+            </h2>
+            <div class="gl-subhead">
+              <span class="gl-only-go">Play On</span>
+              <span class="gl-only-wait">Walking Encouraged</span>
+              <span class="gl-only-no-go">Course Unplayable</span>
+              <span class="gl-subhead-muted">· Pebble Ridge GC</span>
+            </div>
+          </div>
+
+          <div class="gl-conditions-wrap">
+            <div class="gl-conditions">
+              <div class="gl-stat">
+                <div class="gl-stat__label">TEMP</div>
+                <div>
+                  <span class="gl-stat__value gl-only-go">72°</span>
+                  <span class="gl-stat__value gl-only-wait">64°</span>
+                  <span class="gl-stat__value gl-only-no-go">41°</span>
+                  <span class="gl-stat__sub">F</span>
+                </div>
+              </div>
+              <div class="gl-stat">
+                <div class="gl-stat__label">WIND</div>
+                <div>
+                  <span class="gl-stat__value gl-only-go">6</span>
+                  <span class="gl-stat__value gl-only-wait">12</span>
+                  <span class="gl-stat__value gl-only-no-go">28</span>
+                  <span class="gl-stat__sub gl-only-go">MPH SW</span>
+                  <span class="gl-stat__sub gl-only-wait">MPH NW</span>
+                  <span class="gl-stat__sub gl-only-no-go">MPH N</span>
+                </div>
+              </div>
+              <div class="gl-stat">
+                <div class="gl-stat__label">RAIN</div>
+                <div>
+                  <span class="gl-stat__value gl-only-go">0%</span>
+                  <span class="gl-stat__value gl-only-wait">20%</span>
+                  <span class="gl-stat__value gl-only-no-go">90%</span>
+                  <span class="gl-stat__sub gl-only-go">next 4h</span>
+                  <span class="gl-stat__sub gl-only-wait">easing</span>
+                  <span class="gl-stat__sub gl-only-no-go">all day</span>
+                </div>
+              </div>
+              <div class="gl-stat">
+                <div class="gl-stat__label">SKY</div>
+                <div>
+                  <span class="gl-stat__value gl-only-go">Clear</span>
+                  <span class="gl-stat__value gl-only-wait">Damp</span>
+                  <span class="gl-stat__value gl-only-no-go">Storm</span>
+                  <span class="gl-stat__sub gl-only-go">Sunny</span>
+                  <span class="gl-stat__sub gl-only-wait">Overcast</span>
+                  <span class="gl-stat__sub gl-only-no-go">Heavy rain</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gl-action-row">
+            <div class="gl-next">
+              <div class="gl-next__icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                  <circle cx="8" cy="8" r="6.2" stroke-width="1.2" />
+                  <path d="M8 4.5V8l2.2 1.6" stroke-width="1.2" stroke-linecap="round" />
+                </svg>
+              </div>
+              <div class="gl-next__text">
+                <div class="gl-next__label">
+                  <span class="gl-only-go">BEST WINDOW</span>
+                  <span class="gl-only-wait">CARTS RETURN</span>
+                  <span class="gl-only-no-go">NEXT PLAYABLE WINDOW</span>
+                </div>
+                <div>
+                  <span class="gl-next__value gl-only-go">Now → 6:30 PM</span>
+                  <span class="gl-next__value gl-only-wait">By 11:00 AM</span>
+                  <span class="gl-next__value gl-only-no-go">Tue · 9:30 AM</span>
+                </div>
+              </div>
+            </div>
+            <div class="gl-ctas">
+              <button class="gl-btn gl-btn--primary gl-btn--primary--active">Book a Tee Time</button>
+              <button class="gl-btn gl-btn--primary gl-btn--primary--disabled" disabled>Tee Times Unavailable</button>
+              <button class="gl-btn gl-btn--ghost">Call Pro Shop</button>
+            </div>
+          </div>
+
+          <div class="gl-updated-mobile">
+            <span class="gl-updated">
+              <span class="gl-dot gl-dot--sm" aria-hidden="true"></span>
+              <span>Updated 7:02 AM</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============== 7-DAY GOLF FORECAST (mobile) ============== -->
+      <section class="gl-forecast" aria-label="7-day golf forecast">
+        <div class="gl-forecast__row">
+          <div class="gl-fday gl-fday--today">
+            <div class="gl-fday__label">MON<span class="gl-fday__label-today">TODAY</span></div>
+            <span class="gl-fbadge gl-fbadge--great">GREAT</span>
+            <div class="gl-fday__temp">72°</div>
+            <div class="gl-fday__meta">10% 🌧</div>
+            <div class="gl-fday__meta">6 mph</div>
+          </div>
+          <div class="gl-fday">
+            <div class="gl-fday__label">TUE</div>
+            <span class="gl-fbadge gl-fbadge--ok">OK</span>
+            <div class="gl-fday__temp">68°</div>
+            <div class="gl-fday__meta">35% 🌧</div>
+            <div class="gl-fday__meta">14 mph</div>
+          </div>
+          <div class="gl-fday">
+            <div class="gl-fday__label">WED</div>
+            <span class="gl-fbadge gl-fbadge--poor">POOR</span>
+            <div class="gl-fday__temp">61°</div>
+            <div class="gl-fday__meta">80% 🌧</div>
+            <div class="gl-fday__meta">22 mph</div>
+          </div>
+          <div class="gl-fday">
+            <div class="gl-fday__label">THU</div>
+            <span class="gl-fbadge gl-fbadge--poor">POOR</span>
+            <div class="gl-fday__temp">58°</div>
+            <div class="gl-fday__meta">70% 🌧</div>
+            <div class="gl-fday__meta">18 mph</div>
+          </div>
+          <div class="gl-fday">
+            <div class="gl-fday__label">FRI</div>
+            <span class="gl-fbadge gl-fbadge--ok">OK</span>
+            <div class="gl-fday__temp">65°</div>
+            <div class="gl-fday__meta">25% 🌧</div>
+            <div class="gl-fday__meta">11 mph</div>
+          </div>
+          <div class="gl-fday">
+            <div class="gl-fday__label">SAT</div>
+            <span class="gl-fbadge gl-fbadge--great">GREAT</span>
+            <div class="gl-fday__temp">74°</div>
+            <div class="gl-fday__meta">5% 🌧</div>
+            <div class="gl-fday__meta">7 mph</div>
+          </div>
+          <div class="gl-fday">
+            <div class="gl-fday__label">SUN</div>
+            <span class="gl-fbadge gl-fbadge--great">GREAT</span>
+            <div class="gl-fday__temp">76°</div>
+            <div class="gl-fday__meta">0% 🌧</div>
+            <div class="gl-fday__meta">5 mph</div>
+          </div>
+        </div>
+      </section>
+      <!-- ============== /7-DAY GOLF FORECAST ============== -->
+
+      <footer class="gl-footer">
+        <div class="gl-powered">
+          <svg width="11" height="11" viewBox="0 0 12 12" aria-hidden="true">
+            <circle cx="6" cy="6" r="5" stroke-width="1" />
+            <circle cx="6" cy="6" r="2" fill="currentColor" stroke="none" />
+          </svg>
+          POWERED BY GREENLIGHT
+        </div>
+      </footer>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   GreenLight — vanilla JS
+   - Toggles state + theme on every .gl-panel via data attributes
+   - Renders the per-state SVG scene into each .gl-scene-host*
+   ===================================================================== */
+
+const SCENES = {
+  // theme -> state -> palette
+  dark: {
+    go:    { skyTop:"#3b4a78", skyMid:"#6e7ba8", skyLow:"#c9b48a", sun:"#fde68a", sunRing:"#fbbf24", sunGlow:"rgba(251,191,36,0.45)", hillFar:"#1f3d2c", hillMid:"#235a3a", grass:"#22c55e", flag:"#22c55e", cloud:"rgba(255,255,255,0.55)", cloudSoft:"rgba(255,255,255,0.25)", birds:"rgba(40,40,60,0.45)", contour:"rgba(255,255,255,0.07)", topo:"rgba(255,255,255,0.04)", cartLine:"rgba(255,255,255,0.10)", treeStroke:"rgba(0,0,0,0.3)", flagpole:"rgba(255,255,255,0.85)", green:"#3aa75a", ball:"#fff", precip:null, lightning:false, hillNear:"#2a7a48", hole:"#0a0a14" },
+    wait:  { skyTop:"#3a4258", skyMid:"#5a6478", skyLow:"#8a9098", sun:"#cab470", sunRing:"rgba(202,180,112,0.45)", sunGlow:"rgba(202,180,112,0.18)", hillFar:"#252e38", hillMid:"#2d4438", grass:"#65a30d", flag:"#eab308", cloud:"rgba(220,222,228,0.85)", cloudSoft:"rgba(180,185,195,0.55)", birds:"rgba(40,40,60,0.3)", contour:"rgba(255,255,255,0.06)", topo:"rgba(255,255,255,0.04)", cartLine:"rgba(255,255,255,0.10)", treeStroke:"rgba(0,0,0,0.3)", flagpole:"rgba(255,255,255,0.85)", green:"#3aa75a", ball:null, precip:{kind:"drizzle",color:"rgba(180,195,215,0.45)"}, lightning:false, hillNear:"#3a5a3e", hole:"#0a0a14" },
+    "no-go":{ skyTop:"#1f2535", skyMid:"#3a3e4e", skyLow:"#52545e", sun:null, sunRing:null, sunGlow:"rgba(0,0,0,0)", hillFar:"#1c1e26", hillMid:"#23282e", grass:"#3f6740", flag:"#ef4444", cloud:"rgba(60,65,80,0.95)", cloudSoft:"rgba(80,85,100,0.7)", birds:null, contour:"rgba(255,255,255,0.05)", topo:"rgba(255,255,255,0.04)", cartLine:"rgba(255,255,255,0.08)", treeStroke:"rgba(0,0,0,0.4)", flagpole:"rgba(255,255,255,0.7)", green:"#3f6740", ball:null, precip:{kind:"rain",color:"rgba(160,175,200,0.55)"}, lightning:true, hillNear:"#2a3138", hole:"#0a0a14" }
+  },
+  light: {
+    go:    { skyTop:"#7fb8d8", skyMid:"#bce0e8", skyLow:"#fde8c4", sun:"#fde68a", sunRing:"#f59e0b", sunGlow:"rgba(245,158,11,0.35)", hillFar:"#9bb88a", hillMid:"#7ea76b", grass:"#3f8a3a", flag:"#16a34a", cloud:"rgba(255,255,255,0.95)", cloudSoft:"rgba(255,255,255,0.65)", birds:"rgba(31,36,16,0.5)", contour:"rgba(31,36,16,0.10)", topo:"rgba(31,36,16,0.06)", cartLine:"rgba(31,36,16,0.18)", treeStroke:"rgba(31,36,16,0.3)", flagpole:"rgba(31,36,16,0.7)", green:"#4a9a3e", ball:"#fff", precip:null, lightning:false, hillNear:"#5e9050", hole:"#1f2410" },
+    wait:  { skyTop:"#9aa4b0", skyMid:"#c4c8ce", skyLow:"#dcd2b8", sun:"#e8d488", sunRing:"rgba(232,212,136,0.5)", sunGlow:"rgba(212,160,23,0.20)", hillFar:"#8a9c80", hillMid:"#7a8a6e", grass:"#5a8240", flag:"#b45309", cloud:"rgba(245,245,245,0.95)", cloudSoft:"rgba(210,212,218,0.8)", birds:"rgba(31,36,16,0.35)", contour:"rgba(31,36,16,0.10)", topo:"rgba(31,36,16,0.06)", cartLine:"rgba(31,36,16,0.16)", treeStroke:"rgba(31,36,16,0.3)", flagpole:"rgba(31,36,16,0.7)", green:"#4a8a3e", ball:null, precip:{kind:"drizzle",color:"rgba(80,100,120,0.40)"}, lightning:false, hillNear:"#5e7a4c", hole:"#1f2410" },
+    "no-go":{ skyTop:"#5a626e", skyMid:"#7a808a", skyLow:"#a09e90", sun:null, sunRing:null, sunGlow:"rgba(0,0,0,0)", hillFar:"#6e7468", hillMid:"#5a6258", grass:"#4a6240", flag:"#dc2626", cloud:"rgba(110,115,125,0.95)", cloudSoft:"rgba(140,145,155,0.7)", birds:null, contour:"rgba(31,36,16,0.10)", topo:"rgba(31,36,16,0.06)", cartLine:"rgba(31,36,16,0.14)", treeStroke:"rgba(31,36,16,0.3)", flagpole:"rgba(31,36,16,0.7)", green:"#4a6240", ball:null, precip:{kind:"rain",color:"rgba(60,80,110,0.55)"}, lightning:true, hillNear:"#4e5a48", hole:"#1f2410" }
+  }
+};
+
+function buildScene(theme, state, idPrefix) {
+  const P = SCENES[theme][state];
+  const id = idPrefix + "-" + theme + "-" + state;
+  let precip = "";
+  if (P.precip) {
+    const n = P.precip.kind === "rain" ? 70 : 32;
+    const len = P.precip.kind === "rain" ? 14 : 6;
+    const sw = P.precip.kind === "rain" ? 1.3 : 0.8;
+    const lines = [];
+    for (let i=0; i<n; i++) {
+      const x = (i * 47) % 520;
+      const y = ((i * 31) % 180) + 50;
+      lines.push(`<line x1="${x}" y1="${y}" x2="${x-3}" y2="${y+len}" />`);
+    }
+    precip = `<g stroke="${P.precip.color}" stroke-width="${sw}" stroke-linecap="round">${lines.join("")}</g>`;
+  }
+  const sun = state === "go" && P.sun
+    ? `<g><circle cx="380" cy="105" r="32" fill="${P.sun}" /><circle cx="380" cy="105" r="32" fill="none" stroke="${P.sunRing}" stroke-width="1" opacity="0.5" /></g>`
+    : (state === "wait" && P.sun
+        ? `<circle cx="380" cy="100" r="26" fill="${P.sun}" opacity="0.55" />`
+        : "");
+  const sunGlow = P.sun ? `<circle cx="380" cy="105" r="120" fill="url(#sunglow-${id})" />` : "";
+
+  let clouds = "";
+  if (state === "go") {
+    clouds = `
+      <ellipse cx="120" cy="80" rx="48" ry="9" fill="${P.cloudSoft}" />
+      <ellipse cx="135" cy="74" rx="32" ry="7" fill="${P.cloud}" />
+      <ellipse cx="245" cy="55" rx="60" ry="8" fill="${P.cloudSoft}" />
+      <ellipse cx="260" cy="50" rx="38" ry="6" fill="${P.cloud}" />`;
+  } else if (state === "wait") {
+    clouds = `
+      <ellipse cx="80" cy="85" rx="80" ry="20" fill="${P.cloudSoft}" />
+      <ellipse cx="100" cy="78" rx="60" ry="14" fill="${P.cloud}" />
+      <ellipse cx="240" cy="70" rx="100" ry="22" fill="${P.cloudSoft}" />
+      <ellipse cx="260" cy="62" rx="70" ry="14" fill="${P.cloud}" />
+      <ellipse cx="420" cy="90" rx="80" ry="18" fill="${P.cloudSoft}" />
+      <ellipse cx="440" cy="82" rx="55" ry="12" fill="${P.cloud}" />
+      <ellipse cx="180" cy="115" rx="100" ry="14" fill="${P.cloudSoft}" opacity="0.6" />`;
+  } else {
+    clouds = `
+      <ellipse cx="80" cy="60" rx="110" ry="32" fill="${P.cloudSoft}" />
+      <ellipse cx="100" cy="50" rx="85" ry="22" fill="${P.cloud}" />
+      <ellipse cx="260" cy="50" rx="140" ry="36" fill="${P.cloudSoft}" />
+      <ellipse cx="280" cy="40" rx="105" ry="24" fill="${P.cloud}" />
+      <ellipse cx="440" cy="65" rx="110" ry="30" fill="${P.cloudSoft}" />
+      <ellipse cx="450" cy="55" rx="75" ry="20" fill="${P.cloud}" />
+      <ellipse cx="200" cy="115" rx="160" ry="20" fill="rgba(20,22,32,0.45)" />
+      <ellipse cx="380" cy="120" rx="140" ry="16" fill="rgba(20,22,32,0.4)" />`;
+  }
+
+  const lightning = P.lightning ? `
+    <path d="M180 130 L172 158 L182 158 L168 190" stroke="rgba(255,255,200,0.85)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7" />
+    <path d="M180 130 L172 158 L182 158 L168 190" stroke="#fffbe0" stroke-width="0.6" fill="none" stroke-linecap="round" stroke-linejoin="round" />` : "";
+
+  const birds = (P.birds && state !== "no-go") ? `
+    <g stroke="${P.birds}" stroke-width="1.2" fill="none" stroke-linecap="round">
+      <path d="M60 130 q4 -4 8 0 q4 -4 8 0" />
+      <path d="M90 148 q3 -3 6 0 q3 -3 6 0" />
+      <path d="M150 122 q3 -3 6 0 q3 -3 6 0" />
+    </g>` : "";
+
+  const trees = [
+    {x:30, y:230, h:22}, {x:55, y:235, h:16}, {x:80, y:232, h:20},
+    {x:460, y:218, h:18}, {x:482, y:222, h:14}
+  ].map(t => `
+    <g>
+      <ellipse cx="${t.x}" cy="${t.y - t.h*0.5}" rx="${t.h*0.42}" ry="${t.h*0.55}" fill="${P.hillFar}" stroke="${P.treeStroke}" stroke-width="0.5" />
+      <rect x="${t.x-0.8}" y="${t.y-4}" width="1.6" height="6" fill="${P.treeStroke}" />
+    </g>`).join("");
+
+  const flagWave = state === "wait"
+    ? `<path d="M332 232 L356 234 L350 240 L356 244 L332 244 Z" fill="${P.flag}" opacity="0.95" />` : "";
+  const ball = (P.ball && state === "go")
+    ? `<circle cx="295" cy="280" r="2" fill="${P.ball}" ${theme === "light" ? 'stroke="rgba(31,36,16,0.3)" stroke-width="0.5"' : ""} />` : "";
+
+  return `
+<svg class="gl-scene gl-scene-state gl-scene-state--${state} gl-scene-theme--${theme}" viewBox="0 0 520 320" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <linearGradient id="sky-${id}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${P.skyTop}" />
+      <stop offset="55%" stop-color="${P.skyMid}" />
+      <stop offset="100%" stop-color="${P.skyLow}" />
+    </linearGradient>
+    ${P.sun ? `<radialGradient id="sunglow-${id}" cx="0.5" cy="0.5" r="0.5"><stop offset="0%" stop-color="${P.sunGlow}" /><stop offset="100%" stop-color="transparent" /></radialGradient>` : ""}
+    <linearGradient id="grass-${id}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${P.hillNear}" />
+      <stop offset="100%" stop-color="${P.grass}" stop-opacity="0.7" />
+    </linearGradient>
+    <linearGradient id="haze-${id}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${P.skyLow}" stop-opacity="0" />
+      <stop offset="100%" stop-color="${P.skyLow}" stop-opacity="0.65" />
+    </linearGradient>
+    <pattern id="topo-${id}" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+      <path d="M0 40 Q20 30 40 40 T80 40" stroke="${P.topo}" stroke-width="0.6" fill="none" />
+      <path d="M0 60 Q20 50 40 60 T80 60" stroke="${P.topo}" stroke-width="0.6" fill="none" />
+      <path d="M0 20 Q20 10 40 20 T80 20" stroke="${P.topo}" stroke-width="0.6" fill="none" />
+    </pattern>
+  </defs>
+  <rect width="520" height="240" fill="url(#sky-${id})" />
+  ${sunGlow}
+  ${sun}
+  ${clouds}
+  ${lightning}
+  <rect x="0" y="180" width="520" height="60" fill="url(#haze-${id})" />
+  ${birds}
+  ${precip}
+  <path d="M0 220 Q80 195 160 210 T320 205 T520 220 L520 320 L0 320 Z" fill="${P.hillFar}" />
+  <path d="M0 250 Q90 220 180 240 T360 235 T520 250 L520 320 L0 320 Z" fill="${P.hillMid}" />
+  <path d="M0 250 Q90 220 180 240 T360 235 T520 250" stroke="${P.contour}" stroke-width="1" fill="none" />
+  <path d="M0 290 Q60 260 130 275 Q200 290 280 268 Q360 248 440 268 Q490 280 520 274 L520 320 L0 320 Z" fill="url(#grass-${id})" />
+  <path d="M0 290 Q60 260 130 275 Q200 290 280 268 Q360 248 440 268 Q490 280 520 274 L520 320 L0 320 Z" fill="url(#topo-${id})" />
+  <path d="M-10 318 Q150 296 280 290 Q400 285 530 282" stroke="${P.cartLine}" stroke-width="1.5" stroke-dasharray="2 5" fill="none" />
+  ${trees}
+  <g>
+    <ellipse cx="320" cy="278" rx="46" ry="9" fill="${P.green}" opacity="0.9" />
+    <ellipse cx="320" cy="278" rx="46" ry="9" fill="none" stroke="${P.contour}" stroke-width="0.6" />
+    <ellipse cx="332" cy="276" rx="2.5" ry="1" fill="${P.hole}" />
+    <line x1="332" y1="276" x2="332" y2="232" stroke="${P.flagpole}" stroke-width="1.2" />
+    <path d="M332 232 L356 238 L332 244 Z" fill="${P.flag}" />
+    ${flagWave}
+    ${ball}
+  </g>
+</svg>`;
+}
+
+// Render all 6 scene SVGs into both panels (only the matching state+theme is shown via CSS)
+function renderScenes() {
+  const themes = ["dark", "light"];
+  const states = ["go", "wait", "no-go"];
+  const hosts = document.querySelectorAll("#gl-scene-host, .gl-scene-host-mobile");
+  hosts.forEach((host) => {
+    let html = "";
+    themes.forEach(t => states.forEach(s => { html += buildScene(t, s, host.id || "m"); }));
+    host.innerHTML = html;
+  });
+}
+renderScenes();
+
+// Wire up controls
+const panels = document.querySelectorAll(".gl-panel");
+function applyState(s) {
+  panels.forEach(p => p.setAttribute("data-state", s));
+  document.querySelectorAll("[data-set-state]").forEach(b => {
+    b.setAttribute("aria-pressed", b.dataset.setState === s ? "true" : "false");
+  });
+}
+function applyTheme(t) {
+  panels.forEach(p => p.setAttribute("data-theme", t));
+  document.querySelectorAll("[data-set-theme]").forEach(b => {
+    b.setAttribute("aria-pressed", b.dataset.setTheme === t ? "true" : "false");
+  });
+}
+document.querySelectorAll("[data-set-state]").forEach(b => b.addEventListener("click", () => applyState(b.dataset.setState)));
+document.querySelectorAll("[data-set-theme]").forEach(b => b.addEventListener("click", () => applyTheme(b.dataset.setTheme)));
+</script>
+</body>
+</html>
