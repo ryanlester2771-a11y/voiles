@@ -421,6 +421,12 @@
     grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 0;
   }
+
+  /* Hide scrollbar — Chrome, Safari, Edge */
+  .gl-forecast-scroll::-webkit-scrollbar { display: none; }
+
+  /* Hide scrollbar — Firefox */
+  .gl-forecast-scroll { -ms-overflow-style: none; scrollbar-width: none; }
   .gl-fday {
     position: relative;
     display: flex;
@@ -870,7 +876,7 @@
 
       <!-- ============== 7-DAY GOLF FORECAST ============== -->
       <section class="gl-forecast" aria-label="7-day golf forecast">
-        <div class="gl-forecast__row">
+        <div class="gl-forecast__row gl-forecast-scroll">
           <div class="gl-fday gl-fday--today">
             <div class="gl-fday__label">MON<span class="gl-fday__label-today">TODAY</span></div>
             <span class="gl-fbadge gl-fbadge--great">GREAT</span>
@@ -1072,7 +1078,7 @@
 
       <!-- ============== 7-DAY GOLF FORECAST (mobile) ============== -->
       <section class="gl-forecast" aria-label="7-day golf forecast">
-        <div class="gl-forecast__row">
+        <div class="gl-forecast__row gl-forecast-scroll">
           <div class="gl-fday gl-fday--today">
             <div class="gl-fday__label">MON<span class="gl-fday__label-today">TODAY</span></div>
             <span class="gl-fbadge gl-fbadge--great">GREAT</span>
